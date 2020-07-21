@@ -93,6 +93,12 @@ class CreateOrderService {
       })),
     });
 
+    delete order.id;
+    delete order.created_at;
+    delete order.updated_at;
+    delete order.customer.created_at;
+    delete order.customer.updated_at;
+
     return order;
   }
 }
