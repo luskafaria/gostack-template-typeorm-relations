@@ -5,7 +5,6 @@ import AppError from '@shared/errors/AppError';
 import IProductsRepository from '@modules/products/repositories/IProductsRepository';
 import ICustomersRepository from '@modules/customers/repositories/ICustomersRepository';
 import IUpdateProductsQuantityDTO from '@modules/products/dtos/IUpdateProductsQuantityDTO';
-import Order from '../infra/typeorm/entities/Order';
 import IOrdersRepository from '../repositories/IOrdersRepository';
 
 interface IProduct {
@@ -32,7 +31,7 @@ class CreateOrderService {
     private customersRepository: ICustomersRepository,
   ) {}
 
-  public async execute({ customer_id, products }: IRequest): Promise<Order> {
+  public async execute({ customer_id, products }: IRequest): Promise<any> {
     const customerExists = await this.customersRepository.findById(customer_id);
 
     if (!customerExists) {
@@ -61,9 +60,9 @@ class CreateOrderService {
       if (orderProduct && findProduct.quantity < orderProduct.quantity) {
         throw new AppError(
           `
-              ${findProduct.name} current stock: ${findProduct.quantity}\n
-              You have ordered: ${orderProduct.quantity} units
-            `,
+            ${findProduct.name} current stock: ${findProduct.quantity}\n
+            You have ordered: ${orderProduct.quantity} units
+          `,
         );
       }
 
@@ -93,13 +92,22 @@ class CreateOrderService {
       })),
     });
 
-    delete order.id;
-    delete order.created_at;
-    delete order.updated_at;
+    const parsedOrderProducts = order.order_products.map(order_product => {
+      const { product_id, quantity } = order_product;
+      const price = (Math.round(order_product.price * 100) / 100).toFixed(2);
+
+      return { product_id, price, quantity };
+    });
+
     delete order.customer.created_at;
     delete order.customer.updated_at;
 
-    return order;
+    const newOrderData = {
+      customer: { ...order.customer },
+      order_products: parsedOrderProducts,
+    };
+
+    return newOrderData;
   }
 }
 

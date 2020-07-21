@@ -14,10 +14,10 @@ class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ unique: true, nullable: false })
   name: string;
 
-  @Column('decimal')
+  @Column({ nullable: false, type: 'decimal', precision: 3 })
   price: number;
 
   @Column('int')

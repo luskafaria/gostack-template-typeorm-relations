@@ -17,7 +17,7 @@ class Order {
   id: string;
 
   @ManyToOne(() => Customer, { eager: true })
-  @JoinColumn({ name: 'customer_id' })
+  @JoinColumn({ name: 'customer_id', referencedColumnName: 'id' })
   customer: Customer;
 
   @OneToMany(() => OrdersProducts, ordersProducts => ordersProducts.order, {

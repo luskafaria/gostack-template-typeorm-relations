@@ -1,4 +1,4 @@
-import Customer from '@modules/customers/infra/typeorm/entities/Customer';
+// import Customer from '@modules/customers/infra/typeorm/entities/Customer';
 
 interface IProduct {
   product_id: string;
@@ -6,7 +6,13 @@ interface IProduct {
   quantity: number;
 }
 
+interface ICostumer {
+  name: string;
+  id: string;
+  email: string;
+}
+
 export default interface ICreateOrderDTO {
-  customer: Customer;
+  customer: ICostumer;
   products: IProduct[];
 }

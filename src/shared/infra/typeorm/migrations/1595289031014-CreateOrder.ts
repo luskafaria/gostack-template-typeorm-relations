@@ -1,4 +1,9 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+} from 'typeorm';
 
 export default class CreateOrder1595289031014 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -10,12 +15,14 @@ export default class CreateOrder1595289031014 implements MigrationInterface {
             name: 'id',
             type: 'uuid',
             isPrimary: true,
+            isGenerated: true,
             generationStrategy: 'uuid',
             default: 'uuid_generate_v4()',
           },
           {
             name: 'customer_id',
             type: 'uuid',
+            isNullable: true,
           },
           {
             name: 'created_at',
@@ -28,21 +35,23 @@ export default class CreateOrder1595289031014 implements MigrationInterface {
             default: 'now()',
           },
         ],
-        foreignKeys: [
-          {
-            name: 'CustomerId',
-            columnNames: ['customer_id'],
-            referencedColumnNames: ['id'],
-            referencedTableName: 'customers',
-            onUpdate: 'CASCADE',
-            onDelete: 'SET NULL',
-          },
-        ],
+      }),
+    );
+    await queryRunner.createForeignKey(
+      'orders',
+      new TableForeignKey({
+        name: 'CustomerOrder',
+        columnNames: ['customer_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'customers',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.dropForeignKey('customers', 'CustomerOrder');
     await queryRunner.dropTable('orders');
   }
 }
